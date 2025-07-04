@@ -2,6 +2,25 @@
  * Empty Stylesheet file.
  */
 
-.mainFxmlClass {
+.label{
+    
+    -fx-font-weight: bold italic ;
+    -fx-rotate: 0;
 
+    
+}
+
+.chart-legend{
+    -fx-background-color: lightgray;
+    
+}
+
+.chart-series-line{
+    -fx-stroke-width: 2px;
+    
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: green;
+    
 }
