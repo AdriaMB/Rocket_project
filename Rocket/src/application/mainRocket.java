@@ -18,13 +18,6 @@ import javafx.stage.WindowEvent;
  */
 public class mainRocket extends Application{
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/application/FXMLDocument.fxml"));
@@ -34,12 +27,15 @@ public class mainRocket extends Application{
         
         
         stage.show();
-        
-        
-        
-        
-        
+
         
     }
     
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
