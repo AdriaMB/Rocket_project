@@ -41,12 +41,18 @@ bool isCalibrated = false;
 
 // File Handling
 File myFile;
-String fileName = "/test2.txt";
+String fileName = "/project.txt";
 
 unsigned long startTime;
+unsigned long previousTime;
 unsigned long lastLogTime = 0;
 const unsigned long log_interval = 500; // Log every 100ms
-const unsigned long flight_duration = 50000;
+const unsigned long flight_duration = 100000;
+
+// Global calibration variables
+float verticalOffset = 0;
+bool isCalibrated2 = false;
+const int CALIBRATION_SAMPLES = 50;
 /*-------------------------------------------------------------------------------------------------------------------------------------------*/
 
 //functions
@@ -57,6 +63,11 @@ void initSD();
 void file_check();
 void write(unsigned long currentTime);
 float getAmbientTemperature();
+void initQMI();
+void readIMU();
+float getVerticalAcceleration();
+void calibrateVerticalAcceleration();
+float getVerticalVelocity();
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------*/
 /*Main code*/
@@ -70,6 +81,8 @@ void setup() {
   Wire.begin(I2C_SDA,I2C_SCL);
   // Initialize BMP280
   initBMP();
+  // Initialize the QMI sensor
+  initQMI();
   //initialize altitude
   calibrateAltimeter();
   //initialize the sd card
@@ -78,6 +91,7 @@ void setup() {
   check_file();
 
   startTime = millis(); // Record start time
+  previousTime = millis();
 
   delay(100);
 
@@ -85,6 +99,8 @@ void setup() {
 
 void loop() {
   unsigned long currentTime = millis();
+  float acceleration = 0.0;
+  float velocity = 0.0;
   delay(1000);
   
   //log data every 100ms 
@@ -94,12 +110,16 @@ void loop() {
     if(currentTime - startTime < flight_duration)
     {
       write(currentTime); //write data out to sd card
+      acceleration = getVerticalAcceleration();
+      delay(100);
+      velocity = getVerticalVelocity();
+      delay(100);
+      Serial.println("acceleration: ");
+      Serial.println(acceleration);
+      Serial.println("Velocity: ");
+      Serial.println(velocity);
     }
   }
-
-
-
-
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -167,7 +187,7 @@ void check_file()
   // Create new file and write header
   myFile = SD.open(fileName, FILE_WRITE);
   if (myFile) {
-    myFile.println("Time(ms),Altitude(m),Temperature(C),Pressure(hPa)");
+    myFile.println("Time(ms),Altitude(m),Temperature(C),Pressure(hPa),Acceleration(ms/2),Velocity(ms/-1),Accelerometer_Coordinates,Gyroscope_Coordinates");
     myFile.close();
   } else {
     Serial.println("Failed to create log file.");
@@ -183,6 +203,8 @@ void write(unsigned long currentTime)
       float currentAltitude = getAltitude();
       float currentTemperature = getAmbientTemperature();
       float currentPressure = bmp.readPressure() / 100.0; // Convert to hPa
+      float accel = getVerticalAcceleration();
+      float vel = getVerticalVelocity();
 
       if (myFile) 
       {
@@ -193,7 +215,15 @@ void write(unsigned long currentTime)
         myFile.print(",");
         myFile.print(currentTemperature, 2);
         myFile.print(",");
-        myFile.println(currentPressure, 2);
+        myFile.print(currentPressure, 2);
+        myFile.print(",");
+        myFile.print(accel, 2);
+        myFile.print(",");
+        myFile.print(vel,2);
+        myFile.print(",");
+        myFile.print(acc.x);myFile.print("/");myFile.print(acc.y);myFile.print("/");myFile.print(acc.z);
+        myFile.print(",");
+        myFile.print(gyr.x);myFile.print("/");myFile.print(gyr.y);myFile.print("/");myFile.println(gyr.z);
         myFile.close();
 
         Serial.println("Altitude: "); Serial.println(currentAltitude);
@@ -212,4 +242,89 @@ float getAmbientTemperature() {
   float vcc = 3.3; // ESP32 supply voltage
   // Empirical correction (adjust coefficients based on testing)
   return chipTemp - (0.5 * vcc) - 1.2;
+}
+
+//set up the qmi sensor to enable the accelerometer and gyroscope
+void initQMI(){
+  // Initialize QMI8658C Sensor (address is 0x6B)
+  if (!qmi.begin(Wire,QMI_Addr,I2C_SDA,I2C_SCL)) { 
+    // if Sensor could not be found print error
+    Serial.println("QMI not found");
+    // endless loop
+    while (1);
+  }
+  // Configure QMI sensor
+  qmi.enableGyroscope();
+  qmi.enableAccelerometer();
+  qmi.configAccelerometer(
+        SensorQMI8658::ACC_RANGE_4G,
+        SensorQMI8658::ACC_ODR_1000Hz,
+        SensorQMI8658::LPF_MODE_0);
+  qmi.configGyroscope(
+        SensorQMI8658::GYR_RANGE_64DPS,
+        SensorQMI8658::GYR_ODR_896_8Hz,
+        SensorQMI8658::LPF_MODE_3);
+}
+
+/*
+void readIMU() {
+  qmi.getAccelerometer(acc.x, acc.y, acc.z); // In g's (9.81 m/s²)
+  qmi.getGyroscope(gyr.x, gyr.y, gyr.z);     // In degrees per second
+  
+  Serial.printf("Acc: X=%.2fg Y=%.2fg Z=%.2fg\n", acc.x, acc.y, acc.z);
+  Serial.printf("Gyro: X=%.2f°/s Y=%.2f°/s Z=%.2f°/s\n", gyr.x, gyr.y, gyr.z);
+}
+*/
+
+float getVerticalAcceleration() {
+  if (!isCalibrated) {
+    calibrateVerticalAcceleration();
+  }
+  
+  qmi.getAccelerometer(acc.x, acc.y, acc.z);
+  qmi.getGyroscope(gyr.x, gyr.y, gyr.z);
+  
+  // Convert from g to m/s² and remove gravity offset
+  // Use only the vertical axis (Y in this example)
+  float verticalAccel = (acc.y - verticalOffset) * 9.80665;
+  
+  // Optional: Apply simple low-pass filter to reduce noise
+  static float filteredAccel = 0;
+  filteredAccel = 0.9 * filteredAccel + 0.1 * verticalAccel;
+  
+  return filteredAccel;
+}
+
+float getVerticalVelocity() {
+  static float velocity = 0;
+  static unsigned long lastTime = millis();
+  
+  unsigned long currentTime = millis();
+  float dt = (currentTime - lastTime) / 1000.0f;
+  lastTime = currentTime;
+  
+  float acceleration = getVerticalAcceleration();
+  velocity += acceleration * dt;
+  
+  // Small decay to prevent drift (adjust factor as needed)
+  velocity *= 0.995;
+  
+  return velocity;
+}
+
+//calibrating the accelerometer
+void calibrateVerticalAcceleration() {
+  float sum = 0;
+  
+  for (int i = 0; i < CALIBRATION_SAMPLES; i++) {
+    qmi.getAccelerometer(acc.x, acc.y, acc.z);
+    qmi.getGyroscope(gyr.x, gyr.y, gyr.z);
+    sum += acc.y;  // Assuming Y is your vertical axis
+    delay(10);
+  }
+  
+  verticalOffset = sum / CALIBRATION_SAMPLES;
+  isCalibrated2 = true;
+  Serial.print("Calibration complete. Vertical offset: ");
+  Serial.println(verticalOffset);
 }
