@@ -59,10 +59,6 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private MenuItem openFileB; // Button used for choosing the File data
     @FXML
-    private Label labelShowHeight; // This label will represent the values of the chart ( the point where you place the mouse )
-    @FXML
-    private Label labelShowTemperature;
-    @FXML
     private NumberAxis yAxisH;
     @FXML
     private NumberAxis xAxisH;
@@ -72,6 +68,14 @@ public class FXMLDocumentController implements Initializable {
     private Line yAxisLine;
     @FXML
     private Pane paneAxisH;
+    @FXML
+    private Pane paneAxisH1;
+    @FXML
+    private Line xAxisLine1;
+    @FXML
+    private Line yAxisLine1;
+    @FXML
+    private Label labelShowTemperature;
     
     
     /**

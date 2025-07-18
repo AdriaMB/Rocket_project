@@ -15,20 +15,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="1316.0" stylesheets="@FXMLDocument.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLDocumentController">
+<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1316.0" stylesheets="@FXMLDocument.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLDocumentController">
    <top>
       <VBox prefHeight="46.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <MenuBar>
+            <MenuBar id="menuBar">
                <menus>
-                  <Menu mnemonicParsing="false" text="File">
+                  <Menu id="menuFile" mnemonicParsing="false" text="File">
                      <items>
-                        <MenuItem fx:id="openFileB" mnemonicParsing="false" onAction="#loadDocument" text="Open" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Help">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem id="openMenuItem" fx:id="openFileB" mnemonicParsing="false" onAction="#loadDocument" text="Open" />
                      </items>
                   </Menu>
                </menus>
@@ -40,29 +35,32 @@
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="HEIGHT DURING THE FLIGHT" />
-            <StackPane alignment="CENTER_LEFT" maxHeight="350.0" minHeight="350.0" prefHeight="350.0" prefWidth="200.0">
+            <StackPane alignment="CENTER_LEFT" maxHeight="514.0" minHeight="299.0" prefHeight="514.0" prefWidth="1170.0">
                <children>
-                  <HBox prefHeight="344.0" prefWidth="1179.0">
+                  <HBox prefHeight="368.0" prefWidth="1054.0">
                      <children>
-                        <LineChart id="heightChart" fx:id="heightChart" onMouseMoved="#takeHeightData" prefHeight="369.0" prefWidth="733.0">
+                        <LineChart id="heightChart" fx:id="heightChart" onMouseMoved="#takeHeightData" prefHeight="368.0" prefWidth="1309.0">
                           <xAxis>
-                            <NumberAxis autoRanging="false" side="BOTTOM" tickUnit="1.0" upperBound="31.0" fx:id="xAxisH" />
+                            <NumberAxis autoRanging="false" forceZeroInRange="false" label="Time (ms)" lowerBound="1000.0" minorTickCount="1" minorTickLength="8.0" side="BOTTOM" style="-fx-tick-label-fill: white;" tickLabelGap="1.0" tickUnit="500.0" upperBound="12000.0" fx:id="xAxisH" />
                           </xAxis>
                           <yAxis>
-                            <NumberAxis fx:id="yAxisH" side="LEFT" tickUnit="1.0" />
+                            <NumberAxis fx:id="yAxisH" forceZeroInRange="false" label="Height (m)" side="LEFT" style="-fx-tick-label-fill: white;" tickUnit="1.0" />
                           </yAxis>
                         </LineChart>
                         <Label fx:id="labelShowHeight" />
                      </children>
                   </HBox>
-                  <Pane disable="true" maxHeight="350.0" minHeight="350.0" prefHeight="350.0" prefWidth="1295.0" StackPane.alignment="CENTER">
+                  <Pane fx:id="paneAxisH" disable="true" maxHeight="422.0" minHeight="182.0" prefHeight="293.0" prefWidth="1295.0" StackPane.alignment="CENTER">
                      <children>
-                        <Line endY="300.0" layoutX="100.0" fx:id="xAxisLine" />
-                        <Line fx:id="yAxisLine" endX="680.0" layoutX="40.0" layoutY="200.0" />
+                        <Line endY="300.0" layoutX="40.0" style="-fx-stroke: red;" fx:id="xAxisLine" />
+                        <Line fx:id="yAxisLine" endX="1245.0" layoutX="40.0" style="-fx-stroke: red;" />
                      </children>
                      <StackPane.margin>
-                        <Insets top="30.0" />
+                        <Insets bottom="55.0" top="10.0" />
                      </StackPane.margin>
+                     <padding>
+                        <Insets bottom="30.0" top="10.0" />
+                     </padding>
                   </Pane>
                </children>
             </StackPane>
@@ -72,14 +70,14 @@
                </VBox.margin>
             </Separator>
             <Label text="TEMPERATURE DURING THE FLIGHT" />
-            <HBox prefHeight="344.0" prefWidth="1179.0">
+            <HBox prefHeight="323.0" prefWidth="1295.0">
                <children>
-                  <LineChart fx:id="temperatureChart" prefHeight="369.0" prefWidth="733.0">
+                  <LineChart fx:id="temperatureChart" prefHeight="302.0" prefWidth="1296.0">
                      <xAxis>
-                        <NumberAxis autoRanging="false" side="BOTTOM" tickUnit="1.0" upperBound="31.0" />
+                        <NumberAxis autoRanging="false" forceZeroInRange="false" side="BOTTOM" tickUnit="1000.0" upperBound="12000.0" />
                      </xAxis>
                      <yAxis>
-                        <NumberAxis side="LEFT" tickUnit="1.0" />
+                        <NumberAxis lowerBound="20.0" minorTickCount="10" minorTickLength="10.0" side="LEFT" tickUnit="0.001" upperBound="45.0" />
                      </yAxis>
                   </LineChart>
                   <Label fx:id="labelShowTemperature" />

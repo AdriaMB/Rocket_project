@@ -95,12 +95,18 @@ void setup() {
   }
 
   myFile = SD.open(fileName, FILE_WRITE);
+  myFile.println("Test starts");
+  myFile.close();
 
   startTime = millis(); // Record start time
 }
 
 void loop() {
 
+
+
+
+  /**
   //write to file code
   if(millis() - startTime < 2000)
   {
@@ -129,6 +135,9 @@ void loop() {
     myFile.close(); //save written content
     while(1);
   }
+
+*/
+
 
 }
 

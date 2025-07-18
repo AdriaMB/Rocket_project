@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Line?>
+
+<StackPane id="background" alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="514.0" prefWidth="900.0" stylesheets="@FXMLDocument.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.FXMLDocumentController">
+   <children>
+      <LineChart id="heightChart" fx:id="chart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseMoved="#takeHeightData" prefHeight="514.0" prefWidth="900.0" title="measure ">
+        <xAxis>
+          <NumberAxis autoRanging="false" forceZeroInRange="false" label="Time (ms)" minorTickCount="1" minorTickLength="8.0" onMouseMoved="#mouseOverAxis" side="BOTTOM" style="-fx-tick-label-fill: white;" tickLabelGap="1.0" tickUnit="500.0" upperBound="12000.0" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" forceZeroInRange="false" label="Height (m)" side="LEFT" style="-fx-tick-label-fill: white;" tickUnit="0.01" />
+        </yAxis>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin>
+      </LineChart>
+      <Pane fx:id="pane" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="514.0" prefWidth="900.0">
+         <children>
+            <Line endX="-1.52587890625E-5" endY="1035.79296875" layoutX="100.0" startX="1.52587890625E-5" startY="-182.8000030517578" style="-fx-stroke: red;" fx:id="xAxisLine" />
+            <Line fx:id="yAxisLine" endX="1539.2928466796875" endY="-7.62939453125E-6" layoutX="40.0" layoutY="100.0" startX="-266.0999755859375" startY="-7.62939453125E-6" style="-fx-stroke: red;" />
+         </children>
+         <padding>
+            <Insets bottom="30.0" top="10.0" />
+         </padding>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin>
+      </Pane>
+   </children>
+</StackPane>

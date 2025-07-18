@@ -14,7 +14,7 @@
 }
 
 .default-color0.chart-series-line {
-    -fx-stroke: yellow;
+    -fx-stroke: red;
     
 }
 
@@ -44,6 +44,8 @@
     
 }
 
+
+
 #background{
     -fx-background-color: #05263b;
     
@@ -58,4 +60,7 @@
 #openMenuItem{
     -fx-background-color:  #05263b;
     
+}
+.pane:hover{
+    -fx-backgound-color: red;
 }
